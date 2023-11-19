@@ -1,4 +1,3 @@
--- Variables
 local MAX_FOV = 70.0
 local MIN_FOV = 5.0 -- max zoom level (smaller fov is more zoom)
 local ZOOM_SPEED = 10.0 -- camera zoom speed
@@ -8,7 +7,6 @@ local STORE_BINOCULAR_KEY = 177 -- backspace
 local binoculars = false
 local fov = (MAX_FOV + MIN_FOV) * 0.5
 
--- Functions
 local function checkInputRotation(cam, zoomValue)
     local rightAxisX = GetControlNormal(0, 220)
     local rightAxisY = GetControlNormal(0, 221)
@@ -52,11 +50,10 @@ local function hideHUDThisFrame()
     end
 end
 
--- Callbacks
 local cam = nil
 local scaleform = nil
 lib.callback.register('qbx_binoculars:client:toggle', function()
-    if cache.vehicle then return false end
+    if cache.vehicle then return end
     binoculars = not binoculars
 
     if binoculars then
@@ -97,6 +94,4 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
             Wait(0)
         end
     end)
-
-    
 end)
