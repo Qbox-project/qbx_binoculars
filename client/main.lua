@@ -59,7 +59,7 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
     if binoculars then
         TaskStartScenarioInPlace(cache.ped, 'WORLD_HUMAN_BINOCULARS', 0, true)
         cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
-        AttachCamToEntity(cam, cache.ped, 0.0, 0.16, 0.7, true)
+        AttachCamToEntity(cam, cache.ped, 0.0, 0.2, 0.7, true)
         SetCamRot(cam, 0.0, 0.0, GetEntityHeading(cache.ped), 2)
         RenderScriptCams(true, false, 5000, true, false)
     else
