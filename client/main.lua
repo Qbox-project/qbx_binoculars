@@ -49,6 +49,7 @@ local function hideHUDThisFrame()
     end
 end
 
+local cam = nil
 local keybind = lib.addKeybind({
     name = 'closeBinoculars',
     description = 'Close Binoculars',
@@ -62,8 +63,6 @@ local keybind = lib.addKeybind({
         cam = nil
     end,
 })
-
-local cam = nil
 local scaleform = nil
 lib.callback.register('qbx_binoculars:client:toggle', function()
     if cache.vehicle then return end
