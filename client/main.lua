@@ -1,4 +1,3 @@
--- Variables
 local MAX_FOV = 70.0
 local MIN_FOV = 5.0 -- max zoom level (smaller fov is more zoom)
 local ZOOM_SPEED = 10.0 -- camera zoom speed
@@ -8,7 +7,6 @@ local STORE_BINOCULAR_KEY = 177 -- backspace
 local binoculars = false
 local fov = (MAX_FOV + MIN_FOV) * 0.5
 
--- Functions
 local function checkInputRotation(cam, zoomValue)
     local rightAxisX = GetControlNormal(0, 220)
     local rightAxisY = GetControlNormal(0, 221)
@@ -52,17 +50,16 @@ local function hideHUDThisFrame()
     end
 end
 
--- Callbacks
 local cam = nil
 local scaleform = nil
 lib.callback.register('qbx_binoculars:client:toggle', function()
-    if cache.vehicle then return false end
+    if cache.vehicle then return end
     binoculars = not binoculars
 
     if binoculars then
         TaskStartScenarioInPlace(cache.ped, 'WORLD_HUMAN_BINOCULARS', 0, true)
         cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
-        AttachCamToEntity(cam, cache.ped, 0.0, 0.0, 1.0, true)
+        AttachCamToEntity(cam, cache.ped, 0.0, 0.16, 0.7, true)
         SetCamRot(cam, 0.0, 0.0, GetEntityHeading(cache.ped), 2)
         RenderScriptCams(true, false, 5000, true, false)
     else
@@ -77,7 +74,7 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
         while binoculars do
             scaleform = lib.requestScaleformMovie('BINOCULARS')
             BeginScaleformMovieMethod(scaleform, 'SET_CAM_LOGO')
-            ScaleformMovieMethodAddParamInt(0) -- 0 for nothing, 1 for LSPD logo
+            ScaleformMovieMethodAddParamInt(1) -- 0 for nothing, 1 for LSPD logo
             EndScaleformMovieMethod()
     
             if IsControlJustPressed(0, STORE_BINOCULAR_KEY) then -- Toggle binoculars
@@ -97,6 +94,4 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
             Wait(0)
         end
     end)
-
-    
 end)
