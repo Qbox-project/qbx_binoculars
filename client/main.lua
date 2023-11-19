@@ -49,25 +49,25 @@ local function hideHUDThisFrame()
     end
 end
 
+local keybind = lib.addKeybind({
+    name = 'closeBinoculars',
+    description = 'Close Binoculars',
+    defaultKey = 'BACK',
+    onPressed = function()
+        binoculars = false
+        ClearPedTasks(cache.ped)
+        RenderScriptCams(false, true, 1000, false, false)
+        SetScaleformMovieAsNoLongerNeeded()
+        DestroyCam(cam, false)
+        cam = nil
+    end,
+})
+
 local cam = nil
 local scaleform = nil
 lib.callback.register('qbx_binoculars:client:toggle', function()
     if cache.vehicle then return end
     binoculars = not binoculars
-
-    local keybind = lib.addKeybind({
-        name = 'closeBinoculars',
-        description = 'Close Binoculars',
-        defaultKey = 'BACK',
-        onPressed = function()
-            binoculars = false
-            ClearPedTasks(cache.ped)
-            RenderScriptCams(false, true, 1000, false, false)
-            SetScaleformMovieAsNoLongerNeeded()
-            DestroyCam(cam, false)
-            cam = nil
-        end,
-    })
 
     if binoculars then
         TaskStartScenarioInPlace(cache.ped, 'WORLD_HUMAN_BINOCULARS', 0, true)
