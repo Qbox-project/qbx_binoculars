@@ -1,12 +1,12 @@
 -- Variables
-local maxFov = 70.0
-local minFov = 5.0 -- max zoom level (smaller fov is more zoom)
-local zoomSpeed = 10.0 -- camera zoom speed
-local lrSpeed = 8.0 -- speed by which the camera pans left-right
-local udSpeed = 8.0 -- speed by which the camera pans up-down
+local MAX_FOV = 70.0
+local MIN_FOV = 5.0 -- max zoom level (smaller fov is more zoom)
+local ZOOM_SPEED = 10.0 -- camera zoom speed
+local LR_SPEED = 8.0 -- speed by which the camera pans left-right
+local UD_SPEED = 8.0 -- speed by which the camera pans up-down
+local STORE_BINOCULAR_KEY = 177 -- backspace
 local binoculars = false
-local fov = (maxFov + minFov) * 0.5
-local storeBinoclarKey = 177 -- backspace
+local fov = (MAX_FOV + MIN_FOV) * 0.5
 
 -- Functions
 local function checkInputRotation(cam, zoomValue)
@@ -14,8 +14,8 @@ local function checkInputRotation(cam, zoomValue)
     local rightAxisY = GetControlNormal(0, 221)
     local rot = GetCamRot(cam, 2)
     if rightAxisX ~= 0.0 or rightAxisY ~= 0.0 then
-        local newZ = rot.z + rightAxisX * -1.0 * (udSpeed) * (zoomValue + 0.1)
-        local newX = math.max(math.min(20.0, rot.x + rightAxisY * -1.0 * (lrSpeed) * (zoomValue + 0.1)), -89.5)
+        local newZ = rot.z + rightAxisX * -1.0 * (UD_SPEED) * (zoomValue + 0.1)
+        local newX = math.max(math.min(20.0, rot.x + rightAxisY * -1.0 * (LR_SPEED) * (zoomValue + 0.1)), -89.5)
         SetCamRot(cam, newX, 0.0, newZ, 2)
         SetEntityHeading(cache.ped, newZ)
     end
@@ -26,11 +26,11 @@ local function handleZoom(cam)
     local scrollDownControl = IsPedSittingInAnyVehicle(cache.ped) and 16 or 242
 
     if IsControlJustPressed(0, scrollUpControl) then
-        fov = math.max(fov - zoomSpeed, minFov)
+        fov = math.max(fov - ZOOM_SPEED, MIN_FOV)
     end
 
     if IsControlJustPressed(0, scrollDownControl) then
-        fov = math.min(fov + zoomSpeed, maxFov)
+        fov = math.min(fov + ZOOM_SPEED, MAX_FOV)
     end
 
     local currentFov = GetCamFov(cam)
@@ -79,7 +79,7 @@ RegisterNetEvent('qbx_binoculars:client:toggle', function()
         ScaleformMovieMethodAddParamInt(0) -- 0 for nothing, 1 for LSPD logo
         EndScaleformMovieMethod()
 
-        if IsControlJustPressed(0, storeBinoclarKey) then -- Toggle binoculars
+        if IsControlJustPressed(0, STORE_BINOCULAR_KEY) then -- Toggle binoculars
             binoculars = false
             ClearPedTasks(cache.ped)
             RenderScriptCams(false, true, 1000, false, false)
@@ -88,7 +88,7 @@ RegisterNetEvent('qbx_binoculars:client:toggle', function()
             cam = nil
         end
 
-        local zoomValue = (1.0 / (maxFov - minFov)) * (fov - minFov)
+        local zoomValue = (1.0 / (MAX_FOV - MIN_FOV)) * (fov - MIN_FOV)
         checkInputRotation(cam, zoomValue)
         handleZoom(cam)
         hideHUDThisFrame()
