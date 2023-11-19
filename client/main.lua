@@ -55,18 +55,34 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
     if cache.vehicle then return end
     binoculars = not binoculars
 
+    local keybind = lib.addKeybind({
+        name = 'closeBinoculars',
+        description = 'Close Binoculars',
+        defaultKey = 'BACK',
+        onPressed = function()
+            binoculars = false
+            ClearPedTasks(cache.ped)
+            RenderScriptCams(false, true, 1000, false, false)
+            SetScaleformMovieAsNoLongerNeeded()
+            DestroyCam(cam, false)
+            cam = nil
+        end,
+    })
+
     if binoculars then
         TaskStartScenarioInPlace(cache.ped, 'WORLD_HUMAN_BINOCULARS', 0, true)
         cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
         AttachCamToEntity(cam, cache.ped, 0.0, 0.2, 0.7, true)
         SetCamRot(cam, 0.0, 0.0, GetEntityHeading(cache.ped), 2)
         RenderScriptCams(true, false, 5000, true, false)
+        keybind:disable(false)
     else
         ClearPedTasks(cache.ped)
         RenderScriptCams(false, true, 1000, false, false)
         SetScaleformMovieAsNoLongerNeeded()
         DestroyCam(cam, false)
         cam = nil
+        keybind:disable(true)
     end
 
     CreateThread(function()
@@ -75,20 +91,6 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
             BeginScaleformMovieMethod(scaleform, 'SET_CAM_LOGO')
             ScaleformMovieMethodAddParamInt(0)
             EndScaleformMovieMethod()
-
-            lib.addKeybind({
-                name = 'closeBinoculars',
-                description = 'Close Binoculars',
-                defaultKey = 'BACK',
-                onPressed = function()
-                    binoculars = false
-                    ClearPedTasks(cache.ped)
-                    RenderScriptCams(false, true, 1000, false, false)
-                    SetScaleformMovieAsNoLongerNeeded()
-                    DestroyCam(cam, false)
-                    cam = nil
-                end,
-            })
     
             local zoomValue = (1.0 / (MAX_FOV - MIN_FOV)) * (fov - MIN_FOV)
             checkInputRotation(cam, zoomValue)
