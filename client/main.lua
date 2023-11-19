@@ -1,76 +1,60 @@
 -- Variables
-local fov_max = 70.0
-local fov_min = 5.0 -- max zoom level (smaller fov is more zoom)
+local maxFov = 70.0
+local minFov = 5.0 -- max zoom level (smaller fov is more zoom)
 local zoomSpeed = 10.0 -- camera zoom speed
-local speed_lr = 8.0 -- speed by which the camera pans left-right
-local speed_ud = 8.0 -- speed by which the camera pans up-down
+local lrSpeed = 8.0 -- speed by which the camera pans left-right
+local udSpeed = 8.0 -- speed by which the camera pans up-down
 local binoculars = false
-local fov = (fov_max + fov_min) * 0.5
-local storeBinoclarKey = 177 -- Backspace
-local cam = nil
-local scaleform = nil
+local fov = (maxFov + minFov) * 0.5
+local storeBinoclarKey = 177 -- backspace
 
 -- Functions
 local function checkInputRotation(cam, zoomValue)
     local rightAxisX = GetControlNormal(0, 220)
     local rightAxisY = GetControlNormal(0, 221)
-    local rotation = GetCamRot(cam, 2)
+    local rot = GetCamRot(cam, 2)
     if rightAxisX ~= 0.0 or rightAxisY ~= 0.0 then
-        local new_z = rotation.z + rightAxisX * -1.0 * (speed_ud) * (zoomValue + 0.1)
-        local new_x = math.max(math.min(20.0, rotation.x + rightAxisY * -1.0 * (speed_lr) * (zoomValue + 0.1)), -89.5)
-        SetCamRot(cam, new_x, 0.0, new_z, 2)
-        SetEntityHeading(cache.ped, new_z)
+        local newZ = rot.z + rightAxisX * -1.0 * (udSpeed) * (zoomValue + 0.1)
+        local newX = math.max(math.min(20.0, rot.x + rightAxisY * -1.0 * (lrSpeed) * (zoomValue + 0.1)), -89.5)
+        SetCamRot(cam, newX, 0.0, newZ, 2)
+        SetEntityHeading(cache.ped, newZ)
     end
 end
 
 local function handleZoom(cam)
-    if not IsPedSittingInAnyVehicle(cache.ped) then
-        if IsControlJustPressed(0, 241) then -- Scrollup
-            fov = math.max(fov - zoomSpeed, fov_min)
-        end
-        if IsControlJustPressed(0, 242) then
-            fov = math.min(fov + zoomSpeed, fov_max) -- ScrollDown
-        end
-        local current_fov = GetCamFov(cam)
-        if math.abs(fov - current_fov) < 0.1 then
-            fov = current_fov
-        end
-        SetCamFov(cam, current_fov + (fov - current_fov) * 0.05)
-    else
-        if IsControlJustPressed(0, 17) then -- Scrollup
-            fov = math.max(fov - zoomSpeed, fov_min)
-        end
-        if IsControlJustPressed(0, 16) then
-            fov = math.min(fov + zoomSpeed, fov_max) -- ScrollDown
-        end
-        local current_fov = GetCamFov(cam)
-        if math.abs(fov - current_fov) < 0.1 then -- the difference is too small, just set the value directly to avoid unneeded updates to FOV of order 10^-5
-            fov = current_fov
-        end
-        SetCamFov(cam, current_fov + (fov - current_fov) * 0.05) -- Smoothing of camera zoom
+    local scrollUpControl = IsPedSittingInAnyVehicle(cache.ped) and 17 or 241
+    local scrollDownControl = IsPedSittingInAnyVehicle(cache.ped) and 16 or 242
+
+    if IsControlJustPressed(0, scrollUpControl) then
+        fov = math.max(fov - zoomSpeed, minFov)
+    end
+
+    if IsControlJustPressed(0, scrollDownControl) then
+        fov = math.min(fov + zoomSpeed, maxFov)
+    end
+
+    local currentFov = GetCamFov(cam)
+    local fovDifference = fov - currentFov
+
+    if math.abs(fovDifference) > 0.01 then
+        local newFov = currentFov + fovDifference * 0.05
+        SetCamFov(cam, newFov)
     end
 end
 
 local function hideHUDThisFrame()
     HideHelpTextThisFrame()
     HideHudAndRadarThisFrame()
-    HideHudComponentThisFrame(1) -- Wanted Stars
-    HideHudComponentThisFrame(2) -- Weapon icon
-    HideHudComponentThisFrame(3) -- Cash
-    HideHudComponentThisFrame(4) -- MP CASH
-    HideHudComponentThisFrame(6)
-    HideHudComponentThisFrame(7)
-    HideHudComponentThisFrame(8)
-    HideHudComponentThisFrame(9)
-    HideHudComponentThisFrame(13) -- Cash Change
-    HideHudComponentThisFrame(11) -- Floating Help Text
-    HideHudComponentThisFrame(12) -- more floating help text
-    HideHudComponentThisFrame(15) -- Subtitle Text
-    HideHudComponentThisFrame(18) -- Game Stream
-    HideHudComponentThisFrame(19) -- weapon wheel
+
+    local hide = {1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 15, 18, 19}
+    for i = 1, #hide do
+        HideHudComponentThisFrame(hide[i])
+    end
 end
 
 --EVENTS--
+local cam = nil
+local scaleform = nil
 RegisterNetEvent('qbx_binoculars:client:toggle', function()
     if cache.vehicle then return end
     binoculars = not binoculars
@@ -104,7 +88,7 @@ RegisterNetEvent('qbx_binoculars:client:toggle', function()
             cam = nil
         end
 
-        local zoomValue = (1.0 / (fov_max-fov_min)) * (fov-fov_min)
+        local zoomValue = (1.0 / (maxFov - minFov)) * (fov - minFov)
         checkInputRotation(cam, zoomValue)
         handleZoom(cam)
         hideHUDThisFrame()
