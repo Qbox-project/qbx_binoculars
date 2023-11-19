@@ -52,11 +52,11 @@ local function hideHUDThisFrame()
     end
 end
 
---EVENTS--
+-- Callbacks
 local cam = nil
 local scaleform = nil
-RegisterNetEvent('qbx_binoculars:client:toggle', function()
-    if cache.vehicle then return end
+lib.callback.register('qbx_binoculars:client:toggle', function()
+    if cache.vehicle then return false end
     binoculars = not binoculars
 
     if binoculars then
@@ -73,26 +73,30 @@ RegisterNetEvent('qbx_binoculars:client:toggle', function()
         cam = nil
     end
 
-    while binoculars do
-        scaleform = lib.requestScaleformMovie('BINOCULARS')
-        BeginScaleformMovieMethod(scaleform, 'SET_CAM_LOGO')
-        ScaleformMovieMethodAddParamInt(0) -- 0 for nothing, 1 for LSPD logo
-        EndScaleformMovieMethod()
-
-        if IsControlJustPressed(0, STORE_BINOCULAR_KEY) then -- Toggle binoculars
-            binoculars = false
-            ClearPedTasks(cache.ped)
-            RenderScriptCams(false, true, 1000, false, false)
-            SetScaleformMovieAsNoLongerNeeded()
-            DestroyCam(cam, false)
-            cam = nil
+    CreateThread(function()
+        while binoculars do
+            scaleform = lib.requestScaleformMovie('BINOCULARS')
+            BeginScaleformMovieMethod(scaleform, 'SET_CAM_LOGO')
+            ScaleformMovieMethodAddParamInt(0) -- 0 for nothing, 1 for LSPD logo
+            EndScaleformMovieMethod()
+    
+            if IsControlJustPressed(0, STORE_BINOCULAR_KEY) then -- Toggle binoculars
+                binoculars = false
+                ClearPedTasks(cache.ped)
+                RenderScriptCams(false, true, 1000, false, false)
+                SetScaleformMovieAsNoLongerNeeded()
+                DestroyCam(cam, false)
+                cam = nil
+            end
+    
+            local zoomValue = (1.0 / (MAX_FOV - MIN_FOV)) * (fov - MIN_FOV)
+            checkInputRotation(cam, zoomValue)
+            handleZoom(cam)
+            hideHUDThisFrame()
+            DrawScaleformMovieFullscreen(scaleform, 255, 255, 255, 255, 0)
+            Wait(0)
         end
+    end)
 
-        local zoomValue = (1.0 / (MAX_FOV - MIN_FOV)) * (fov - MIN_FOV)
-        checkInputRotation(cam, zoomValue)
-        handleZoom(cam)
-        hideHUDThisFrame()
-        DrawScaleformMovieFullscreen(scaleform, 255, 255, 255, 255, 0)
-        Wait(0)
-    end
+    
 end)
