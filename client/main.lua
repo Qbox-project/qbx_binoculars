@@ -59,7 +59,7 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
     if binoculars then
         TaskStartScenarioInPlace(cache.ped, 'WORLD_HUMAN_BINOCULARS', 0, true)
         cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
-        AttachCamToEntity(cam, cache.ped, 0.0, 0.0, 1.0, true)
+        AttachCamToEntity(cam, cache.ped, 0.0, 0.16, 0.7, true)
         SetCamRot(cam, 0.0, 0.0, GetEntityHeading(cache.ped), 2)
         RenderScriptCams(true, false, 5000, true, false)
     else
@@ -74,7 +74,7 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
         while binoculars do
             scaleform = lib.requestScaleformMovie('BINOCULARS')
             BeginScaleformMovieMethod(scaleform, 'SET_CAM_LOGO')
-            ScaleformMovieMethodAddParamInt(0) -- 0 for nothing, 1 for LSPD logo
+            ScaleformMovieMethodAddParamInt(1) -- 0 for nothing, 1 for LSPD logo
             EndScaleformMovieMethod()
     
             if IsControlJustPressed(0, STORE_BINOCULAR_KEY) then -- Toggle binoculars
