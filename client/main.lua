@@ -3,7 +3,6 @@ local MIN_FOV = 5.0 -- max zoom level (smaller fov is more zoom)
 local ZOOM_SPEED = 10.0 -- camera zoom speed
 local LR_SPEED = 8.0 -- speed by which the camera pans left-right
 local UD_SPEED = 8.0 -- speed by which the camera pans up-down
-local STORE_BINOCULAR_KEY = 177 -- backspace
 local binoculars = false
 local fov = (MAX_FOV + MIN_FOV) * 0.5
 
@@ -74,17 +73,22 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
         while binoculars do
             scaleform = lib.requestScaleformMovie('BINOCULARS')
             BeginScaleformMovieMethod(scaleform, 'SET_CAM_LOGO')
-            ScaleformMovieMethodAddParamInt(1) -- 0 for nothing, 1 for LSPD logo
+            ScaleformMovieMethodAddParamInt(0)
             EndScaleformMovieMethod()
-    
-            if IsControlJustPressed(0, STORE_BINOCULAR_KEY) then -- Toggle binoculars
-                binoculars = false
-                ClearPedTasks(cache.ped)
-                RenderScriptCams(false, true, 1000, false, false)
-                SetScaleformMovieAsNoLongerNeeded()
-                DestroyCam(cam, false)
-                cam = nil
-            end
+
+            lib.addKeybind({
+                name = 'closeBinoculars',
+                description = 'Close Binoculars',
+                defaultKey = 'BACK',
+                onPressed = function()
+                    binoculars = false
+                    ClearPedTasks(cache.ped)
+                    RenderScriptCams(false, true, 1000, false, false)
+                    SetScaleformMovieAsNoLongerNeeded()
+                    DestroyCam(cam, false)
+                    cam = nil
+                end,
+            })
     
             local zoomValue = (1.0 / (MAX_FOV - MIN_FOV)) * (fov - MIN_FOV)
             checkInputRotation(cam, zoomValue)
