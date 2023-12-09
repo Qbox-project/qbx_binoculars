@@ -57,8 +57,6 @@ local keybind = lib.addKeybind({
     onPressed = function()
         binoculars = false
         ClearPedTasks(cache.ped)
-        RenderScriptCams(false, true, 1000, false, false)
-        SetScaleformMovieAsNoLongerNeeded()
         DestroyCam(cam, false)
         cam = nil
     end,
