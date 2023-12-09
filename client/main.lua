@@ -65,7 +65,7 @@ local keybind = lib.addKeybind({
 })
 local scaleform = nil
 lib.callback.register('qbx_binoculars:client:toggle', function()
-    if cache.vehicle or QBX.PlayerData.metadata.isdead or QBX.PlayerData.metadata.ishandcuffed or QBX.PlayerData.metadata.inlaststand then return end
+    if cache.vehicle or or IsPedSwimming(cache.ped) or QBX.PlayerData.metadata.isdead or QBX.PlayerData.metadata.ishandcuffed or QBX.PlayerData.metadata.inlaststand then return end
     binoculars = not binoculars
 
     if binoculars then
