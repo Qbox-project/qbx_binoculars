@@ -50,6 +50,7 @@ local function hideHUDThisFrame()
 end
 
 local cam = nil
+local scaleform
 local keybind = lib.addKeybind({
     name = 'closeBinoculars',
     description = 'Close Binoculars',
@@ -63,7 +64,6 @@ local keybind = lib.addKeybind({
         cam = nil
     end,
 })
-local scaleform
 lib.callback.register('qbx_binoculars:client:toggle', function()
     if cache.vehicle or IsPedSwimming(cache.ped) or QBX.PlayerData.metadata.isdead or QBX.PlayerData.metadata.ishandcuffed or QBX.PlayerData.metadata.inlaststand then return end
     binoculars = not binoculars
