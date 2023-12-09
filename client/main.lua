@@ -50,6 +50,7 @@ local function hideHUDThisFrame()
 end
 
 local cam = nil
+local scaleform
 local keybind = lib.addKeybind({
     name = 'closeBinoculars',
     description = 'Close Binoculars',
@@ -57,28 +58,27 @@ local keybind = lib.addKeybind({
     onPressed = function()
         binoculars = false
         ClearPedTasks(cache.ped)
-        RenderScriptCams(false, true, 1000, false, false)
-        SetScaleformMovieAsNoLongerNeeded()
+        RenderScriptCams(false, true, 500, false, false)
+        SetScaleformMovieAsNoLongerNeeded(scaleform)
         DestroyCam(cam, false)
         cam = nil
     end,
 })
-local scaleform = nil
 lib.callback.register('qbx_binoculars:client:toggle', function()
-    if cache.vehicle then return end
+    if cache.vehicle or IsPedSwimming(cache.ped) or QBX.PlayerData.metadata.isdead or QBX.PlayerData.metadata.ishandcuffed or QBX.PlayerData.metadata.inlaststand then return end
     binoculars = not binoculars
 
     if binoculars then
         TaskStartScenarioInPlace(cache.ped, 'WORLD_HUMAN_BINOCULARS', 0, true)
-        cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
+        cam = CreateCam('DEFAULT_SCRIPTED_FLY_CAMERA', true)
         AttachCamToEntity(cam, cache.ped, 0.0, 0.2, 0.7, true)
         SetCamRot(cam, 0.0, 0.0, GetEntityHeading(cache.ped), 2)
-        RenderScriptCams(true, false, 5000, true, false)
+        RenderScriptCams(true, false, 500, true, false)
         keybind:disable(false)
     else
         ClearPedTasks(cache.ped)
-        RenderScriptCams(false, true, 1000, false, false)
-        SetScaleformMovieAsNoLongerNeeded()
+        RenderScriptCams(false, true, 500, false, false)
+        SetScaleformMovieAsNoLongerNeeded(scaleform)
         DestroyCam(cam, false)
         cam = nil
         keybind:disable(true)
@@ -90,7 +90,7 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
             BeginScaleformMovieMethod(scaleform, 'SET_CAM_LOGO')
             ScaleformMovieMethodAddParamInt(0)
             EndScaleformMovieMethod()
-    
+
             local zoomValue = (1.0 / (MAX_FOV - MIN_FOV)) * (fov - MIN_FOV)
             checkInputRotation(cam, zoomValue)
             handleZoom(cam)
