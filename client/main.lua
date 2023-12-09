@@ -57,13 +57,15 @@ local keybind = lib.addKeybind({
     onPressed = function()
         binoculars = false
         ClearPedTasks(cache.ped)
+        RenderScriptCams(false, true, 500, false, false)
+        SetScaleformMovieAsNoLongerNeeded(scaleform)
         DestroyCam(cam, false)
         cam = nil
     end,
 })
-local scaleform = nil
+local scaleform
 lib.callback.register('qbx_binoculars:client:toggle', function()
-    if cache.vehicle or or IsPedSwimming(cache.ped) or QBX.PlayerData.metadata.isdead or QBX.PlayerData.metadata.ishandcuffed or QBX.PlayerData.metadata.inlaststand then return end
+    if cache.vehicle or IsPedSwimming(cache.ped) or QBX.PlayerData.metadata.isdead or QBX.PlayerData.metadata.ishandcuffed or QBX.PlayerData.metadata.inlaststand then return end
     binoculars = not binoculars
 
     if binoculars then
@@ -71,12 +73,12 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
         cam = CreateCam('DEFAULT_SCRIPTED_FLY_CAMERA', true)
         AttachCamToEntity(cam, cache.ped, 0.0, 0.2, 0.7, true)
         SetCamRot(cam, 0.0, 0.0, GetEntityHeading(cache.ped), 2)
-        RenderScriptCams(true, false, 5000, true, false)
+        RenderScriptCams(true, false, 500, true, false)
         keybind:disable(false)
     else
         ClearPedTasks(cache.ped)
-        RenderScriptCams(false, true, 1000, false, false)
-        SetScaleformMovieAsNoLongerNeeded()
+        RenderScriptCams(false, true, 500, false, false)
+        SetScaleformMovieAsNoLongerNeeded(scaleform)
         DestroyCam(cam, false)
         cam = nil
         keybind:disable(true)
