@@ -1,5 +1,4 @@
-![image](https://github.com/alberttheprince/qbx_binoculars/assets/85725579/27c0e506-a579-4c45-b58d-f877979ca371)
-
+![image](https://github.com/Qbox-project/qbx_binoculars/assets/22198949/b647808d-dab5-491e-bb45-590b2a2033c5)
 
 # qbx_binoculars
 
