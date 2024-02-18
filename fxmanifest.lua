@@ -3,7 +3,7 @@ game 'gta5'
 
 description 'qbx_binoculars'
 repository 'https://github.com/Qbox-project/qbx_binoculars'
-version '1.1.0'
+version '1.1.1'
 
 shared_script '@ox_lib/init.lua'
 
