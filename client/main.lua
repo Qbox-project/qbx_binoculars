@@ -56,6 +56,7 @@ local keybind = lib.addKeybind({
     description = 'Close Binoculars',
     defaultKey = 'BACK',
     onPressed = function()
+        if not binoculars then return end
         binoculars = false
         ClearPedTasks(cache.ped)
         RenderScriptCams(false, true, 500, false, false)
