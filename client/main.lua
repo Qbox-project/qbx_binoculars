@@ -98,7 +98,7 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
             checkInputRotation(cam, zoomValue)
             handleZoom(cam)
             hideHUDThisFrame()
-            DrawScaleformMovieFullscreen(scaleform, 255, 255, 255, 255, 0)
+            DrawScaleformMovie(scaleform, 0.5, 0.5, 1.0, 1.0, 255, 255, 255, 255)
             Wait(0)
         end
     end)
