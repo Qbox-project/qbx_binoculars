@@ -51,6 +51,15 @@ end
 
 local cam = nil
 local scaleform
+
+local function closeBinoculars()
+    ClearPedTasks(cache.ped)
+    RenderScriptCams(false, true, 500, false, false)
+    SetScaleformMovieAsNoLongerNeeded(scaleform)
+    DestroyCam(cam, false)
+    cam = nil
+end
+
 local keybind = lib.addKeybind({
     name = 'closeBinoculars',
     description = 'Close Binoculars',
@@ -58,13 +67,10 @@ local keybind = lib.addKeybind({
     onPressed = function()
         if not binoculars then return end
         binoculars = false
-        ClearPedTasks(cache.ped)
-        RenderScriptCams(false, true, 500, false, false)
-        SetScaleformMovieAsNoLongerNeeded(scaleform)
-        DestroyCam(cam, false)
-        cam = nil
+        closeBinoculars()
     end,
 })
+
 lib.callback.register('qbx_binoculars:client:toggle', function()
     if cache.vehicle or IsPedSwimming(cache.ped) or QBX.PlayerData.metadata.isdead or QBX.PlayerData.metadata.ishandcuffed or QBX.PlayerData.metadata.inlaststand then return end
     binoculars = not binoculars
@@ -77,11 +83,7 @@ lib.callback.register('qbx_binoculars:client:toggle', function()
         RenderScriptCams(true, false, 500, true, false)
         keybind:disable(false)
     else
-        ClearPedTasks(cache.ped)
-        RenderScriptCams(false, true, 500, false, false)
-        SetScaleformMovieAsNoLongerNeeded(scaleform)
-        DestroyCam(cam, false)
-        cam = nil
+        closeBinoculars()
         keybind:disable(true)
     end
 
