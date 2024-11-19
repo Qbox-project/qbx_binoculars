@@ -71,7 +71,7 @@ local keybind = lib.addKeybind({
     end,
 })
 
-lib.callback.register('qbx_binoculars:client:toggle', function()
+RegisterNetEvent('qbx_binoculars:client:toggle', function()
     if cache.vehicle or IsPedSwimming(cache.ped) or QBX.PlayerData.metadata.isdead or QBX.PlayerData.metadata.ishandcuffed or QBX.PlayerData.metadata.inlaststand then return end
     binoculars = not binoculars
 
