@@ -6,7 +6,12 @@ local UD_SPEED = 8.0 -- speed by which the camera pans up-down
 local binoculars = false
 local fov = (MAX_FOV + MIN_FOV) * 0.5
 
-local function checkInputRotation(cam, zoomValue)
+local cam = nil
+local scaleform
+
+local function checkInputRotation(zoomValue)
+    if not cam then return end
+
     local rightAxisX = GetControlNormal(0, 220)
     local rightAxisY = GetControlNormal(0, 221)
     local rot = GetCamRot(cam, 2)
@@ -18,7 +23,9 @@ local function checkInputRotation(cam, zoomValue)
     end
 end
 
-local function handleZoom(cam)
+local function handleZoom()
+    if not cam then return end
+
     local scrollUpControl = IsPedSittingInAnyVehicle(cache.ped) and 17 or 241
     local scrollDownControl = IsPedSittingInAnyVehicle(cache.ped) and 16 or 242
 
@@ -49,15 +56,17 @@ local function hideHUDThisFrame()
     end
 end
 
-local cam = nil
-local scaleform
-
 local function closeBinoculars()
     ClearPedTasks(cache.ped)
     RenderScriptCams(false, true, 500, false, false)
-    SetScaleformMovieAsNoLongerNeeded(scaleform)
-    DestroyCam(cam, false)
-    cam = nil
+
+    if cam then
+        DestroyCam(cam, false)
+        cam = nil
+    end
+
+    scaleform:Dispose()
+    scaleform = nil
 end
 
 local keybind = lib.addKeybind({
@@ -77,11 +86,17 @@ RegisterNetEvent('qbx_binoculars:client:toggle', function()
 
     if binoculars then
         TaskStartScenarioInPlace(cache.ped, 'WORLD_HUMAN_BINOCULARS', 0, true)
+
         cam = CreateCam('DEFAULT_SCRIPTED_FLY_CAMERA', true)
         AttachCamToEntity(cam, cache.ped, 0.0, 0.2, 0.7, true)
         SetCamRot(cam, 0.0, 0.0, GetEntityHeading(cache.ped), 2)
         RenderScriptCams(true, false, 500, true, false)
+
         keybind:disable(false)
+
+        scaleform = qbx.newScaleform('BINOCULARS') -- Create a new scaleform
+        scaleform:MethodArgs("SET_CAM_LOGO", {0}) -- Set the cam logo
+        scaleform:Draw(true) -- Draw the scaleform
     else
         closeBinoculars()
         keybind:disable(true)
@@ -89,16 +104,10 @@ RegisterNetEvent('qbx_binoculars:client:toggle', function()
 
     CreateThread(function()
         while binoculars do
-            scaleform = lib.requestScaleformMovie('BINOCULARS')
-            BeginScaleformMovieMethod(scaleform, 'SET_CAM_LOGO')
-            ScaleformMovieMethodAddParamInt(0)
-            EndScaleformMovieMethod()
-
             local zoomValue = (1.0 / (MAX_FOV - MIN_FOV)) * (fov - MIN_FOV)
-            checkInputRotation(cam, zoomValue)
-            handleZoom(cam)
+            checkInputRotation(zoomValue)
+            handleZoom()
             hideHUDThisFrame()
-            DrawScaleformMovie(scaleform, 0.5, 0.5, 1.0, 1.0, 255, 255, 255, 255)
             Wait(0)
         end
     end)
