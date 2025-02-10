@@ -53,8 +53,10 @@ local cam = nil
 local scaleform
 
 local function closeBinoculars()
+    ClearTimecycleModifier()
+    fov = (MAX_FOV + MIN_FOV) * 0.5
     ClearPedTasks(cache.ped)
-    RenderScriptCams(false, true, 500, false, false)
+    RenderScriptCams(false, false, 500, true, false)
     SetScaleformMovieAsNoLongerNeeded(scaleform)
     DestroyCam(cam, false)
     cam = nil
